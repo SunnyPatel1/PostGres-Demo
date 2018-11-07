@@ -26,85 +26,79 @@
 
 10. Create a table with standard syntax:
 
-    > create table coursesInfo.course (
-    > cFaculty VARCHAR(4) NOT NULL,
-    > cId integer NOT NULL,
-    > title VARCHAR(32) NOT NULL,
-    > PRIMARY KEY (cFaculty, cId));
+    ```sql
+    create table coursesInfo.course (
+    cFaculty VARCHAR(4) NOT NULL,
+    cId integer NOT NULL,
+    title VARCHAR(32) NOT NULL,
+    PRIMARY KEY (cFaculty, cId));
+    ```
 
 11. I used the following insert statements to insert some tuples we can work with:
 
-    > insert into coursesInfo.course values ('SOFE', 1010, 'Introduction to Programming');
-    >
-    > insert into coursesInfo.course values ('SOFE', 2010, 'Object Oriented Programming');
-    >
-    > insert into coursesInfo.course values ('MATH', 1010, 'Calculus I');
-    >
-    > insert into coursesInfo.course values ('PSYC', 2010, 'Abnormal Psychology');
+    ```sql
+    insert into coursesInfo.course values ('SOFE', 1010, 'Introduction to Programming');
+    insert into coursesInfo.course values ('SOFE', 2010, 'Object Oriented Programming');
+    insert into coursesInfo.course values ('MATH', 1010, 'Calculus I');
+    insert into coursesInfo.course values ('PSYC', 2010, 'Abnormal Psychology');
+    ```
 
 12. To verify entries, you can run `select * from coursesInfo.course;` Result should be similar to: 
 
-    ` cfaculty | cid  |            title
+    ```
+     cfaculty | cid  |            title
     ----------+------+-----------------------------
      SOFE     | 1010 | Introduction to Programming
      SOFE     | 2010 | Object Oriented Programming
      MATH     | 1010 | Calculus I
      PSYC     | 2010 | Abnormal Psychology
-    (4 rows)`
+     (4 rows)`
+    ```
 
 13. I used the following entries to create 2 other tables with foreign keys
 
-    > create table coursesInfo.session (
-    >
-    > cFaculty VARCHAR(4) NOT NULL,
-    >
-    > cId integer NOT NULL,
-    >
-    > sectionNum integer NOT NULL,
-    >
-    > semester VARCHAR(10) NOT NULL,
-    >
-    > instructor VARCHAR(32) NOT NULL,
-    >
-    > PRIMARY KEY (cFaculty, cId, sectionNum, semester),
-    >
-    > FOREIGN KEY (cFaculty, cId) REFERENCES coursesInfo.course(cFaculty, cId)
-    >
-    > );
+    ```sql
+    create table coursesInfo.session (
+    cFaculty VARCHAR(4) NOT NULL,
+    cId integer NOT NULL,
+    sectionNum integer NOT NULL,
+    semester VARCHAR(10) NOT NULL,
+    instructor VARCHAR(32) NOT NULL,
+    PRIMARY KEY (cFaculty, cId, sectionNum, semester),
+    FOREIGN KEY (cFaculty, cId) REFERENCES coursesInfo.course(cFaculty, cId)
+    );
+    ```
 
-    > insert into coursesInfo.session values ('SOFE', 1010, 1, 'fall2018', 'Khalid Hafeez');
-    >
-    > insert into coursesInfo.session values ('SOFE', 1010, 2, 'fall2018', 'Anwar Abdulbari');
-    >
-    > insert into coursesInfo.session values ('PSYC', 1010, 1, 'winter2018', 'Shannon Vetter');
-    >
-    > insert into coursesInfo.session values ('SOFE', 2010, 5, 'winter2019', 'Some Prof');
-    >
-    > insert into coursesInfo.session values ('MATH', 1010, 1, 'fall2018', 'Ilona Kletskin');
-    >
-    > insert into coursesInfo.session values ('MATH', 1010, 2, 'fall2018', 'Paula Dicato');
-    >
-    > insert into coursesInfo.session values ('MATH', 1010, 1, 'fall2017', 'Ming Ding');
 
-    > create table coursesInfo.prereq (
-    >
-    > targetFaculty VARCHAR(4) NOT NULL,
-    >
-    > targetId integer NOT NULL,
-    >
-    > prereqFaculty VARCHAR(4) NOT NULL,
-    >
-    > prereqId integer NOT NULL,
-    >
-    > FOREIGN KEY (targetFaculty, targetId) REFERENCES coursesInfo.course(cFaculty, cId),
-    >
-    > FOREIGN KEY (prereqFaculty, prereqId) REFERENCES coursesInfo.course(cFaculty, cId)
-    >
-    > );
 
-    > insert into coursesInfo.prereq values ('SOFE', 2010, 'SOFE', 1010);
+    ```sql
+    insert into coursesInfo.session values ('SOFE', 1010, 1, 'fall2018', 'Khalid Hafeez');
+    insert into coursesInfo.session values ('SOFE', 1010, 2, 'fall2018', 'Anwar Abdulbari');
+    insert into coursesInfo.session values ('PSYC', 1010, 1, 'winter2018', 'Shannon Vetter');
+    insert into coursesInfo.session values ('SOFE', 2010, 5, 'winter2019', 'Some Prof');
+    insert into coursesInfo.session values ('MATH', 1010, 1, 'fall2018', 'Ilona Kletskin');
+    insert into coursesInfo.session values ('MATH', 1010, 2, 'fall2018', 'Paula Dicato');
+    insert into coursesInfo.session values ('MATH', 1010, 1, 'fall2017', 'Ming Ding');
+    ```
 
-14. Now we can say we have finished setting up a trivial database. We can now implement the API logic
+
+
+    ```sql
+    create table coursesInfo.prereq (
+    targetFaculty VARCHAR(4) NOT NULL,
+    targetId integer NOT NULL,
+    prereqFaculty VARCHAR(4) NOT NULL,
+    prereqId integer NOT NULL,
+    FOREIGN KEY (targetFaculty, targetId) REFERENCES coursesInfo.course(cFaculty, cId),
+    FOREIGN KEY (prereqFaculty, prereqId) REFERENCES coursesInfo.course(cFaculty, cId)
+    );
+    ```
+
+    ```sql
+    insert into coursesInfo.prereq values ('SOFE', 2010, 'SOFE', 1010);
+    ```
+
+    Now we can say we have finished setting up a trivial database. We can now implement the API logic
 
 
 
@@ -122,14 +116,16 @@ Here, we build a basic node app. where we use node-postgres and express.
 
 2. At the top, we have our "imports". We can import modules, and assign them to variables. Add the following lines:
 
-   > const express = require('express');
-   >
-   > const app = express();
-   >
-   > var pg = require('pg');
-   >
-   > var conString = "postgres://postgres:root@localhost:5432/university"; //Can be found in the Details page
-   > var client = new pg.Client(conString);
+   ```javascript
+   const express = require('express');
+   
+   const app = express();
+   
+   var pg = require('pg');
+   
+   var conString = "postgres://postgres:root@localhost:5432/university"; //Can be found in the Details page
+   var client = new pg.Client(conString);
+   ```
 
    The format of the connection string follows `postgres://user:pass@domain/dbname`. 
 
@@ -139,18 +135,20 @@ Here, we build a basic node app. where we use node-postgres and express.
 
 3. Now we can connect to the client, and have an error function in the case that it does not work. This will be in the form of a callback function (i.e. the contents only run once connection is established).
 
-   > client.connect(function(err) {
-   > ​	if(err) {
-   > ​		return console.log('could not connect to postgres', err);
-   > ​	}
-   >
-   > //The url selection logic goes here
-   >
-   > }
+   ```javascript
+   client.connect(function(err) {
+   	if(err) {
+   		return console.log('could not connect to postgres', err);
+   	}
+   	app.get('/', (req, res) => {
+   		res.send('Improper use of API. Please refer to the API Reference Manual');
+   	});
+   }
+   ```
 
 4. We can now use the `app` variable we defined prior to listen on the local server for specific urls. The syntax follows a callback function as below:
 
-    `app.get('/url1/url2/', (req, res) => { // code here })` The `req` contains the url, query strings, and parameters as required. 
+   `app.get('/url1/url2/', (req, res) => { // code here })` The `req` contains the url, query strings, and parameters as required. 
 
    For example, if we set the URL string to `/url/:id` and we needed to access id, we can use `req.params.id`
 
@@ -160,32 +158,34 @@ Here, we build a basic node app. where we use node-postgres and express.
 
    For our purposes, we have the following statements. Throw these inside the prior connect() callback so we have this:
 
-   > client.connect(function(err) {
-   > ​	if(err) {
-   > ​		return console.log('could not connect to postgres', err);
-   > ​	}
-   > ​	app.get('/', (req, res) => {
-   > ​		res.send('Improper use of API. Please refer to the API Reference Manual');
-   > ​	});
-   >
-   > 	app.get('/api/courses', (req, res) => {
-   > 		res.send([1,2,3]);
-   > 	});
-   > 	
-   > 	app.get('/api/sessions', (req, res) => {
-   > 		const queryParams = req.query;
-   > 		if (Object.keys(req.query).length === 0) {
-   > 			res.send("No Query Params");
-   > 		}
-   > 		else {
-   > 			getSessions(req.query, res);
-   > 		}
-   > 	});
-   > 	
-   > 	app.get("/api/getPrereqs/:faculty/:id", (req, res) => {
-   > 		getPrereqs(req.params.faculty, req.params.id, res);
-   > 	});
-   > })
+```javascript
+client.connect(function(err) {
+	if(err) {
+		return console.log('could not connect to postgres', err);
+	}
+	app.get('/', (req, res) => {
+		res.send('Improper use of API. Please refer to the API Reference Manual');
+	});
+
+	app.get('/api/courses', (req, res) => {
+		res.send([1,2,3]);
+	});
+
+	app.get('/api/sessions', (req, res) => {
+		const queryParams = req.query;
+		if (Object.keys(req.query).length === 0) {
+			res.send("No Query Params");
+		}
+		else {
+			getSessions(req.query, res);
+		}
+	});
+
+	app.get("/api/getPrereqs/:faculty/:id", (req, res) => {
+		getPrereqs(req.params.faculty, req.params.id, res);
+	});
+})
+```
 
    Now we run the queries through functions `getSessions` and `getPrereqs` . They each have a `res` parameter, as the only reliable way to write to the page is AFTER they are done querying (asynchronicity)
 
@@ -193,7 +193,7 @@ Here, we build a basic node app. where we use node-postgres and express.
 
    An example of the getPrereqs function by faculty and id is shown below:
 
-   ```javascript
+```javascript
    function getPrereqs(faculty, id, serverRes) {
    	query = "SELECT * FROM coursesInfo.prereq WHERE targetFaculty = '" + faculty + "' AND targetid = " + id + ";";
    
@@ -207,6 +207,13 @@ Here, we build a basic node app. where we use node-postgres and express.
    	  	}
    	  });
    }
-   ```
+```
 
-   And this writes to the page
+And this sends the output of the query to the page requested via http. Therefore, if a javascript app with AJAX calls localhost:3000/api/sessions?instructor=Khalid%20Hafeez, the resulting tuples can be obtained as a JSON object.
+
+Lastly, we specify the server location for the app.
+
+```javascript
+app.listen(3000);
+```
+
